@@ -3,7 +3,6 @@ from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
-    # Ваши остальные поля модели Category...
 
     def __str__(self):
         return self.name
@@ -11,7 +10,7 @@ class Category(models.Model):
     class Meta:
         db_table = 'task_manager_category'
         verbose_name = 'Category'
-        verbose_name_plural = 'Categories'  # Или 'Category', если требуется жестко совпадение с 'Category'
+        verbose_name_plural = 'Categories'
         constraints = [
             models.UniqueConstraint(fields=['name'], name='unique_category_name')
         ]
@@ -19,15 +18,18 @@ class Category(models.Model):
 
 class Task(models.Model):
     title = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)  # Поле даты создания
-    # Ваши остальные поля модели Task...
+    description = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=50, default='New')
+    deadline = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    categories = models.ManyToManyField(Category, related_name='tasks', blank=True)
 
     def __str__(self):
         return self.title
 
     class Meta:
         db_table = 'task_manager_task'
-        ordering = ['-created_at']  # Сортировка по убыванию даты создания
+        ordering = ['-created_at']
         verbose_name = 'Task'
         verbose_name_plural = 'Tasks'
         constraints = [
@@ -36,16 +38,19 @@ class Task(models.Model):
 
 
 class SubTask(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='subtasks', null=True, blank=True)
     title = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)  # Поле даты создания
-    # Ваши остальные поля модели SubTask...
+    description = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=50, default='New')
+    deadline = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
     class Meta:
         db_table = 'task_manager_subtask'
-        ordering = ['-created_at']  # Сортировка по убыванию даты создания
+        ordering = ['-created_at']
         verbose_name = 'SubTask'
         verbose_name_plural = 'SubTasks'
         constraints = [
