@@ -1,20 +1,10 @@
 from django.contrib import admin
-from .models import Task, SubTask, Category
-
+from .models import Task, SubTask
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_at')
-    search_fields = ('title',)
-
+    list_display = ('id', 'title', 'status', 'deadline') # Здесь status есть, и это верно
 
 @admin.register(SubTask)
 class SubTaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created_at')
-    search_fields = ('title',)
-
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+    list_display = ('id', 'title', 'task', 'completed') # Убрали 'status' отсюда

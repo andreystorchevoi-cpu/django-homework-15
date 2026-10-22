@@ -1,15 +1,15 @@
 import os
 from pathlib import Path
-import environ
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+SECRET_KEY = 'django-insecure-your-secret-key-here'
 
-SECRET_KEY = env('SECRET_KEY')
-DEBUG = env.bool('DEBUG', default=False)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
+DEBUG = True
+
+ALLOWED_HOSTS = []
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -19,7 +19,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
+
+    'tasks',
     'main',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -32,7 +36,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+
 
 TEMPLATES = [
     {
@@ -50,32 +54,15 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
 
-USE_MYSQL = env.bool('USE_MYSQL', default=False)
 
-if USE_MYSQL:
-    import pymysql
-
-    pymysql.install_as_MySQLdb()
-
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': env('DB_NAME'),
-            'USER': env('DB_USER'),
-            'PASSWORD': env('DB_PASSWORD'),
-            'HOST': env('DB_HOST'),
-            'PORT': env('DB_PORT'),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -92,13 +79,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 LANGUAGE_CODE = 'ru-ru'
-TIME_ZONE = 'UTC'
+
+TIME_ZONE = 'Europe/Moscow'
+
 USE_I18N = True
+
 USE_TZ = True
+
 
 STATIC_URL = 'static/'
 
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+ROOT_URLCONF = 'config.urls'
+WSGI_APPLICATION = 'config.wsgi.application'
