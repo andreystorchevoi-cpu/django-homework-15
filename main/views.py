@@ -1,56 +1,24 @@
-
-from rest_framework import generics, filters
-from django_filters.rest_framework import DjangoFilterBackend
-
-from .models import Task, SubTask
-from .serializers import (
-    TaskCreateSerializer,
-    TaskDetailSerializer,
-    SubTaskCreateSerializer,
-    SubTaskSerializer,
-)
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .models import Category
+from .serializers import CategorySerializer
 
 
-class TaskListCreateView(generics.ListCreateAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskCreateSerializer
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ]
+    @action(detail=True, methods=['get'])
+    def count_tasks(self, request, pk=None):
+        category = self.get_object()
+        tasks_count = category.tasks.count()
 
-    filterset_fields = ['status', 'deadline']
-    search_fields = ['title', 'description']
-    ordering_fields = ['created_at']
-    ordering = ['-id']
-
-
-class TaskDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskCreateSerializer
-
-
-class SubTaskListCreateView(generics.ListCreateAPIView):
-    queryset = SubTask.objects.select_related('task').all()
-    serializer_class = SubTaskCreateSerializer
-
-    filter_backends = [
-        DjangoFilterBackend,
-        filters.SearchFilter,
-        filters.OrderingFilter,
-    ]
-
-    filterset_fields = ['completed', 'task__deadline']
-    search_fields = ['title', 'task__title']
-    ordering_fields = ['created_at']
-    ordering = ['-created_at']
-
-
-class SubTaskDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = SubTask.objects.all()
-    serializer_class = SubTaskCreateSerializer
+        return Response({
+            "category_id": category.id,
+            "category_name": category.name,
+            "tasks_count": tasks_count
+        })
 
 
 
